@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enemy Territory: Arcade Edition</title>
+<meta name="description" content="Enemy Territory: Arcade Edition brings four-player split-screen, Omni-bot matches on all six stock maps, controller support, a pad-friendly server browser and ultrawide display support to Wolfenstein: Enemy Territory 2.60b.">
+<meta property="og:title" content="Enemy Territory: Arcade Edition">
+<meta property="og:description" content="Wolfenstein: Enemy Territory with four-player split-screen, Omni-bot matches and controller support. Uses your own 2.60b game data.">
+<meta property="og:url" content="https://lodilorenzo.github.io/et-arcade-edition/">
+<meta property="og:image" content="https://lodilorenzo.github.io/et-arcade-edition/assets/social.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://lodilorenzo.github.io/et-arcade-edition/">
+<link rel="icon" href="assets/icon.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip-link" href="#top">Skip to content</a>
+
+<header class="topbar">
+  <a class="brand" href="#top"><img src="assets/logo.webp" width="1400" height="391" alt="Enemy Territory: Arcade Edition"></a>
+  <nav class="desktop-nav" aria-label="Main navigation">
+    <a href="#fronts">Maps</a>
+    <a href="#split">Split-screen</a>
+    <a href="#controller">Controller</a>
+    <a class="btn btn-focus btn-small" href="#download">Download</a>
+  </nav>
+  <details class="mobile-nav">
+    <summary>Menu</summary>
+    <nav aria-label="Compact navigation">
+      <a href="#fronts">Maps</a>
+      <a href="#split">Split-screen</a>
+      <a href="#controller">Controller</a>
+      <a href="#download">Download</a>
+    </nav>
+  </details>
+</header>
+
+<main id="top" tabindex="-1">
+
+<!-- Cover art: Gold Rush at dusk, the wordmark beside it -->
+<section class="hero">
+  <div class="hero-copy">
+    <h1 class="wordmark"><img src="assets/logo.webp" width="1400" height="391" alt="Enemy Territory: Arcade Edition"></h1>
+    <p class="kicker type" data-type>Wolfenstein: Enemy Territory 2.60b, now built for couch play.</p>
+    <p class="tagline">Split-screen, bots and online play</p>
+    <p class="lead">Splash Damage's 2003 classic, with new ways to play. Up to four
+      players on one screen, Omni-bot squads on every stock map, full controller support and a pad-friendly
+      server browser.</p>
+    <div class="actions">
+      <a class="btn btn-focus" href="#download">Download</a>
+      <a class="btn" href="#trailer" data-play>Watch trailer</a>
+    </div>
+  </div>
+</section>
+
+<!-- Trailer: landscape, or the portrait cut on phones held upright (site.js) -->
+<section class="trailer" id="trailer">
+  <div class="plate hero-video">
+    <div class="titlebar titlebar-small"><span>Feature trailer</span></div>
+    <div class="inset">
+      <video controls preload="none" playsinline poster="assets/trailer-poster.webp"
+        data-portrait-src="assets/trailer-portrait.mp4" data-portrait-poster="assets/trailer-poster-portrait.webp">
+        <source src="assets/trailer.mp4" type="video/mp4">
+      </video>
+    </div>
+    <p class="hint">Real footage from this build · 1:44</p>
+  </div>
+</section>
+
+<!-- Briefing -->
+<section class="briefing">
+  <details class="dossier">
+    <summary>Mission briefing</summary>
+    <div class="briefing-copy">
+    <p class="stamp">*** Top secret ***</p>
+    <h2>Objective: Enemy Territory</h2>
+    <p>The engine, renderer, networking and every original game rule are compiled from the official
+      GPL source. Nothing has been re-imagined: original maps, scripts, classes and objectives stay
+      exactly as Splash Damage shipped them.</p>
+    <p>On top of that foundation, this build adds what the game never had: local split-screen for up to
+      four players, Omni-bot AI that fills both teams, Xbox controller support with radial wheels and
+      aim assistance, and a portable launcher that runs from a single folder.</p>
+    <p class="signoff">Bring your own 2.60b game data, extract the build and play.</p>
+    </div>
+  </details>
+</section>
+
+<!-- 01 · Maps + bots -->
+<section class="card" id="fronts">
+  <p class="eyebrow">01 · Maps and bots</p>
+  <h2 class="headline">All six stock maps, with their original objectives and scripts</h2>
+  <p class="sub">Omni-bots build, plant, defuse and capture on every map, so a full match needs only you.</p>
+</section>
+
+<section class="wrap">
+  <div class="maps">
+    <figure class="map">
+      <div class="inset"><img src="assets/battery.webp" width="1280" height="720" decoding="async" alt="Bots storming the beach on Seawall Battery" loading="lazy"></div>
+      <figcaption><span class="maptag">Seawall Battery</span>Forward Bunker captured. Beach assault ramp and five MG nests built. Dynamite planted.</figcaption>
+    </figure>
+    <figure class="map">
+      <div class="inset"><img src="assets/fueldump.webp" width="1280" height="720" decoding="async" alt="Snowy approach on Fuel Dump" loading="lazy"></div>
+      <figcaption><span class="maptag">Fuel Dump</span>Bridges built and blown. Tunnel grate breached. Tank damaged. Command post raised.</figcaption>
+    </figure>
+    <figure class="map">
+      <div class="inset"><img src="assets/goldrush.webp" width="1280" height="720" decoding="async" alt="Night street fight on Gold Rush" loading="lazy"></div>
+      <figcaption><span class="maptag">Gold Rush</span>Bank doors destroyed. Tank stolen, damaged and repaired. Truck hit. Command post built.</figcaption>
+    </figure>
+    <figure class="map">
+      <div class="inset"><img src="assets/oasis.webp" width="1280" height="720" decoding="async" alt="Rifleman in the Old City of Siwa Oasis" loading="lazy"></div>
+      <figcaption><span class="maptag">Siwa Oasis</span>Old City captured. Water pumps and tunnels. Wall demolished. Both anti-tank guns destroyed.</figcaption>
+    </figure>
+    <figure class="map">
+      <div class="inset"><img src="assets/radar.webp" width="1280" height="720" decoding="async" alt="Bunker interior on Würzburg Radar" loading="lazy"></div>
+      <figcaption><span class="maptag">Würzburg Radar</span>Main and side entrances breached. Radar parts secured. Forward Bunker taken and retaken.</figcaption>
+    </figure>
+    <figure class="map">
+      <div class="inset"><img src="assets/railgun.webp" width="1280" height="720" decoding="async" alt="Rail tracks through the snow on Rail Gun" loading="lazy"></div>
+      <figcaption><span class="maptag">Rail Gun</span>Depot Yard captured by both teams. Track switch raised and lowered. Dynamite defused.</figcaption>
+    </figure>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="titlebar"><span>Omni-bot AI</span><b>01 / 13</b></div>
+      <p>Matches hold 4 to 48 players, humans included. Bots fill the empty slots, rebalance the teams when
+        you switch sides and answer your Medic and Need-ammo calls, with seven difficulty levels.</p>
+    </div>
+    <div class="feature">
+      <div class="titlebar"><span>Native rules</span><b>02 / 13</b></div>
+      <p>Original game type and unchanged map scripts. Engineers build and plant, medics revive and
+        field ops resupply. Reinforcement waves and time limits work exactly as in the original game.</p>
+    </div>
+    <div class="feature">
+      <div class="titlebar"><span>24 versus 24</span><b>03 / 13</b></div>
+      <p>With full teams the scoreboard switches to compact rows, so all 48 players are listed in every
+        view and every score arrives intact.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 · Split-screen -->
+<section class="card" id="split">
+  <p class="eyebrow">02 · Split-screen</p>
+  <h2 class="headline">Up to four players on one screen, offline or online</h2>
+  <p class="sub">Every player gets their own view, HUD, controller and limbo menu.</p>
+</section>
+
+<section class="wrap">
+  <figure class="showcase plate">
+    <div class="inset"><img src="assets/four-playing.webp" width="1280" height="720" decoding="async" alt="Four-player split-screen on Siwa Oasis" loading="lazy"></div>
+    <figcaption class="caption">
+      <div class="titlebar"><span>Local split-screen</span><b>04 / 13</b></div>
+      <p>Two players side by side, or three or four in a 2×2 grid. Each player has their own prediction, camera, HUD,
+        recoil and controller: real local play, not duplicated cameras.</p>
+    </figcaption>
+  </figure>
+
+  <div class="trio">
+    <figure class="shot">
+      <div class="inset"><img src="assets/input-map-local-3.webp" width="1280" height="720" decoding="async" alt="Three players with a live command map in the fourth pane" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Live command map</span><b>05</b></div>
+        <p>With three players, pane four shows a live view of the whole battlefield.</p></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="inset"><img src="assets/online-four-etmain-host.webp" width="1280" height="720" decoding="async" alt="Four online split-screen views" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Online split-screen</span><b>06</b></div>
+        <p>Each view has its own connection, player identity and controller. Server rules always apply.</p></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="inset"><img src="assets/four-menus.webp" width="1280" height="720" decoding="async" alt="Four per-player limbo menus open at once" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Per-player limbo</span><b>07</b></div>
+        <p>Choose team, class and loadout in your own view while the match keeps running.</p></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 03 · Controller -->
+<section class="card" id="controller">
+  <p class="eyebrow">03 · Controller</p>
+  <h2 class="headline">Designed to be played with a controller</h2>
+  <p class="sub">Up to four Xbox (XInput) controllers, which can be connected or removed at any time.</p>
+</section>
+
+<section class="wrap controller">
+  <div class="features features-2">
+    <div class="feature">
+      <div class="titlebar"><span>Radial wheels</span><b>08 / 13</b></div>
+      <p>Point the stick and release to choose. The wheels are shaped like cartridge-case bases: US brass for
+        the Allies and lacquered steel for the Axis. Call for a medic, engineer, ammo or backup with the original voice lines.</p>
+    </div>
+    <div class="feature">
+      <div class="titlebar"><span>Aim assist</span><b>09 / 13</b></div>
+      <p>Halo-style slowdown and tracking with six strengths, for controllers only. It never snaps to
+        targets, steers bullets or adds damage. Moving the mouse switches it off immediately.</p>
+    </div>
+  </div>
+
+  <figure class="showcase plate wide">
+    <div class="inset"><img src="assets/team-wheels-v2.webp" width="1280" height="720" alt="Axis equipment wheel and Allied assistance wheel side by side" loading="lazy" decoding="async"></div>
+  </figure>
+
+  <details class="plate pad">
+    <summary>Field manual · Gamepad controls</summary>
+    <div class="manual-content">
+      <div class="dials" aria-hidden="true">
+        <img class="dial dial-axis" src="assets/dial_axis.webp" width="480" height="480" alt="" loading="lazy">
+        <img class="dial dial-allies" src="assets/dial_allies.webp" width="480" height="480" alt="" loading="lazy">
+      </div>
+      <table class="rows" aria-label="Gamepad controls">
+        <tr><th scope="row">Left stick</th><td>Move</td></tr>
+        <tr><th scope="row">Right stick</th><td>Look</td></tr>
+        <tr><th scope="row">RT / LT</th><td>Fire / Zoom (binoculars)</td></tr>
+        <tr><th scope="row">A / B / X</th><td>Jump / Crouch / Reload</td></tr>
+        <tr><th scope="row">LB / RB</th><td>Sprint / Activate</td></tr>
+        <tr class="hl"><th scope="row">Hold Y</th><td>Equipment wheel</td></tr>
+        <tr class="hl"><th scope="row">Hold D-pad up</th><td>Class assistance wheel</td></tr>
+        <tr><th scope="row">D-pad</th><td>Alt mode · Prone · Lean</td></tr>
+        <tr><th scope="row">Back / Start</th><td>Limbo / Match menu</td></tr>
+        <tr><th scope="row">L3 / R3</th><td>Scoreboard / Command map</td></tr>
+      </table>
+    </div>
+  </details>
+</section>
+
+<!-- 04 · Interface -->
+<section class="card">
+  <p class="eyebrow">04 · Interface</p>
+  <h2 class="headline">New menus in the style of Enemy Territory's original interface</h2>
+  <p class="sub">Riveted steel windows, screwed title strips and brass-faced buttons, redrawn for controller navigation.</p>
+</section>
+
+<section class="wrap">
+  <div class="quad">
+    <figure class="shot">
+      <div class="inset"><img src="assets/ui-art-main.webp" width="1280" height="720" decoding="async" alt="Main menu" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Main menu</span><b>10</b></div>
+        <p>Choose the number of players, the map and the total player count, then start the match.</p></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="inset"><img src="assets/players-setup.webp" width="1280" height="720" decoding="async" alt="Players and controllers setup" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Player profiles</span><b>11</b></div>
+        <p>Names, XP and medals are saved for each player. Names can be typed with the controller.</p></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="inset"><img src="assets/map-chooser-real.webp" width="1280" height="720" decoding="async" alt="Map chooser with downloaded maps" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Any map you download</span><b>12</b></div>
+        <p>Maps downloaded from online servers appear here, with bundled bot navigation for 682 of them.</p></figcaption>
+    </figure>
+    <figure class="shot">
+      <div class="inset"><img src="assets/ui-art-browser-rows.webp" width="640" height="480" decoding="async" alt="Pad-friendly server browser" loading="lazy"></div>
+      <figcaption><div class="titlebar"><span>Pad-friendly browser</span><b>13</b></div>
+        <p>Lists only open servers with enough free slots for everyone on your couch.</p></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 05 · Ultrawide -->
+<section class="card">
+  <p class="eyebrow">05 · Display</p>
+  <h2 class="headline">Native support for ultrawide and high-refresh displays</h2>
+  <p class="sub">Runs at 3440×1440 and 120 Hz with a Hor+ field of view.</p>
+</section>
+
+<section class="ultrawide">
+  <img src="assets/ultrawide.webp" width="1920" height="810" decoding="async" alt="Gold Rush streets at 21:9" loading="lazy">
+  <div class="caption plate">
+    <div class="titlebar"><span>Native ultrawide</span></div>
+    <p>At 21:9 the horizontal field of view widens to about 121.6° while keeping the original vertical coverage. HUD and menus scale
+      without stretching. Full-resolution 32-bit textures with 16× anisotropic filtering.</p>
+  </div>
+</section>
+
+<!-- 06 · Download -->
+<section class="card" id="download">
+  <p class="eyebrow">06 · Download</p>
+  <h2 class="headline">Get the source or check for portable releases</h2>
+  <p class="sub">Build instructions are in the source repository. Original game files are not included: use your own Enemy Territory 2.60b installation.</p>
+</section>
+
+<section class="wrap">
+  <div class="plate get">
+    <img class="boxart" src="assets/cover.webp" width="720" height="1080" alt="Enemy Territory: Arcade Edition cover: an Axis soldier waits at a corner as two Allied soldiers advance down a Gold Rush street" loading="lazy" decoding="async">
+    <div class="get-copy">
+      <div class="actions">
+        <a class="btn btn-focus btn-large" href="https://github.com/lodilorenzo/et-arcade-edition/releases">Check releases</a>
+        <a class="btn" href="https://github.com/lodilorenzo/et-arcade-edition/archive/refs/heads/main.zip">Source (GPL)</a>
+      </div>
+      <p class="hint">No packaged releases are published yet. <a class="build-link" href="https://github.com/lodilorenzo/et-arcade-edition#build-from-source">Build from source</a> to play.</p>
+      <p class="hint">Windows 8.1 or newer · Xbox / XInput controllers optional · No original game data included</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="plate step">
+      <div class="titlebar"><span>01 · Build or download</span></div>
+      <p>Build from source, or extract a portable release when available. A portable package contains
+        <code>Play-ET.exe</code>, the engine, the modules and the menus. Local bot matches also need the
+        Omni-bot runtime. Use a folder you can write to.</p>
+    </div>
+    <div class="plate step">
+      <div class="titlebar"><span>02 · Add game data</span></div>
+      <p>On first run, choose your <b>Enemy Territory 2.60b</b> folder. The launcher copies
+        <code>pak0</code>–<code>pak2</code> and <code>mp_bin</code> after checking their SHA-256 hashes against the 2.60b release.</p>
+    </div>
+    <div class="plate step">
+      <div class="titlebar"><span>03 · Play</span></div>
+      <p>Choose <b>Start Match</b> to play against bots, or <b>Play Online</b> to browse servers. Profiles, downloads and your
+        identity stay in the package folder.</p>
+    </div>
+  </div>
+
+  <aside class="inset notes">
+    <h3>Field notes</h3>
+    <ul>
+      <li>Only join servers you trust. ET mods run native code, and the old network and map parsers have not been security-audited.</li>
+      <li>PunkBuster is not supported. Servers that require an official executable or specific anti-cheat may reject this build.</li>
+      <li>Online servers send their own client modules, so aim assistance and profiles only apply in local matches.</li>
+    </ul>
+  </aside>
+</section>
+
+</main>
+
+<footer class="footer">
+  <section class="credits" id="credits" aria-labelledby="credits-title">
+    <h2 id="credits-title">Credits</h2>
+    <dl>
+      <div>
+        <dt>Original game</dt>
+        <dd>Wolfenstein: Enemy Territory was developed by <a href="https://www.splashdamage.com/" rel="noopener">Splash Damage</a>
+          and released free by id Software and Activision in 2003.</dd>
+      </div>
+      <div>
+        <dt>Source code</dt>
+        <dd>id Software released the <a href="https://github.com/id-Software/Enemy-Territory" rel="noopener">game and engine source</a>
+          under the GPL in 2010. This build is compiled from that release.</dd>
+      </div>
+      <div>
+        <dt>ET: Legacy</dt>
+        <dd>Selected fixes, player identity, the Omni-bot adapter and the master server come from
+          <a href="https://www.etlegacy.com/" rel="noopener">ET: Legacy</a>, the community's open-source
+          continuation of the game (<a href="https://github.com/etlegacy/etlegacy" rel="noopener">source</a>).</dd>
+      </div>
+      <div>
+        <dt>Omni-bot</dt>
+        <dd>The bot AI, navigation and map-goal scripts are provided by the Omni-bot authors.</dd>
+      </div>
+    </dl>
+  </section>
+  <p>Enemy Territory: Arcade Edition is an altered adaptation of id Software's GPL source for Wolfenstein: Enemy Territory. This is
+    <b>not</b> the original game and not an official id Software, Splash Damage or ET: Legacy release.
+    Engine code is GPLv3-or-later with additional terms. The game data is not GPL and is not distributed here.</p>
+  <p class="small">Wolfenstein and Enemy Territory are trademarks of their respective owners.</p>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

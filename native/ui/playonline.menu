@@ -1,0 +1,135 @@
+// Unified browser; original LAN cache and join commands.
+#include "ui/menudef.h"
+#define WINDOW_X 8
+#define WINDOW_Y 8
+#define WINDOW_WIDTH 624
+#define WINDOW_HEIGHT 464
+#define GROUP_NAME "browser"
+#include "ui/menumacros.h"
+#include "ui/slicemacros.h"
+
+menuDef {
+ name "playonline"
+ rect WINDOW_X WINDOW_Y WINDOW_WIDTH WINDOW_HEIGHT
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus ; clearFocus ; setcvar ui_browserSort 4 ; uiScript sliceBrowserSort }
+ onESC { uiScript StopRefresh ; close playonline ; open main }
+ // X maps to Delete in the native pad UI; keyboard R also refreshes.
+ execKeyInt 140 { uiScript RefreshServers }
+ execKey "r" { uiScript RefreshServers }
+
+ PANEL( 0, 0, 624, 464 )
+ TITLEBAR( 10, 8, 604, 24, "PLAY ONLINE", .22 )
+ INSET( 6, 90, 612, 280 )
+ // Steel controls; the brass face follows controller/mouse focus.
+ ART_THREE( 12, 40, 190, 26, .088, "ui/art/button3", "bnsource", "art", 1 )
+ ART_THREE( 12, 40, 190, 26, .088, "ui/art/button_focus3", "bfsource", "artfocus", 0 )
+ ART_THREE( 210, 40, 206, 26, .088, "ui/art/button3", "bnsort", "art", 1 )
+ ART_THREE( 210, 40, 206, 26, .088, "ui/art/button_focus3", "bfsort", "artfocus", 0 )
+ ART_THREE( 424, 40, 188, 26, .088, "ui/art/button3", "bnplayers", "art", 1 )
+ ART_THREE( 424, 40, 188, 26, .088, "ui/art/button_focus3", "bfplayers", "artfocus", 0 )
+
+ // First focus is the list. Moving through rows never executes JoinServer.
+ itemDef {
+  name "serverList"
+  rect 12 96 600 268
+  type ITEM_TYPE_LISTBOX
+  forecolor .9 .9 .88 1
+  border WINDOW_BORDER_FULL
+  bordercolor 0 0 0 0
+  outlinecolor .62 .5 .25 .45
+  textfont UI_FONT_COURBD_21
+  textscale .20
+  textaligny -8
+  elementwidth 584
+  elementheight 22
+  elementtype LISTBOX_TEXT
+  columns 5 2 260 40 264 102 14 368 62 8 432 86 12 520 60 6
+  feeder FEEDER_SERVERS
+  visible 1
+  onFocus { setitemcolor serverList bordercolor .78 .63 .33 .9 }
+  leaveFocus { setitemcolor serverList bordercolor 0 0 0 0 }
+  tooltip "Choose a server; A joins it. Left / Right moves to the controls."
+  onEnter { uiScript JoinServer }
+  doubleClick { uiScript JoinServer }
+ }
+ itemDef {
+  name "source"
+  rect 12 40 190 26
+  type ITEM_TYPE_MULTI
+  text "Source:"
+  textfont UI_FONT_COURBD_21
+  textscale .32
+  textalignx 8
+  textaligny 19
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  forecolor .78 .77 .7 1
+  visible 1
+  cvar "ui_netSource"
+  cvarFloatList { "Internet" 1 "LAN" 0 }
+  action { uiScript UpdateFilter }
+  onFocus { show bfsource ; setitemcolor source forecolor 1 .86 .58 1 }
+  leaveFocus { hide bfsource ; setitemcolor source forecolor .78 .77 .7 1 }
+ }
+ itemDef {
+  name "sort"
+  rect 210 40 206 26
+  type ITEM_TYPE_MULTI
+  text "Sort:"
+  textfont UI_FONT_COURBD_21
+  textscale .32
+  textalignx 8
+  textaligny 19
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  forecolor .78 .77 .7 1
+  visible 1
+  cvar "ui_browserSort"
+  cvarFloatList { "Lowest ping" 4 "Most players" 2 "Server name" 0 }
+  action { uiScript sliceBrowserSort }
+  onFocus { show bfsort ; setitemcolor sort forecolor 1 .86 .58 1 }
+  leaveFocus { hide bfsort ; setitemcolor sort forecolor .78 .77 .7 1 }
+ }
+ itemDef {
+  name "players"
+  rect 424 40 188 26
+  type ITEM_TYPE_MULTI
+  text "Players:"
+  textfont UI_FONT_COURBD_21
+  textscale .28
+  textalignx 8
+  textaligny 19
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  forecolor .78 .77 .7 1
+  visible 1
+  // Same local player count as Start Match; re-ping the cached list and refilter by free slots.
+  cvar "cl_splitScreen"
+  cvarFloatList { "1" 0 "2 split" 1 "3 split + map" 3 "4 split" 4 }
+  action { uiScript RefreshFilter }
+  onFocus { show bfplayers ; setitemcolor players forecolor 1 .86 .58 1 }
+  leaveFocus { hide bfplayers ; setitemcolor players forecolor .78 .77 .7 1 }
+ }
+ LABELWHITE( 14, 76, 260, 16, "SERVER", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ LABELWHITE( 276, 76, 102, 16, "MAP", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ LABELWHITE( 380, 76, 62, 16, "PLAYERS", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ LABELWHITE( 444, 76, 86, 16, "MODE", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ LABELWHITE( 532, 76, 60, 16, "PING", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ itemDef {
+  name "status"
+  rect 12 372 600 16
+  type ITEM_TYPE_OWNERDRAW
+  ownerdraw UI_SERVERREFRESHDATE
+  textfont UI_FONT_COURBD_21
+  textscale .23
+  textaligny 12
+  forecolor .85 .85 .85 1
+  visible 1
+  decoration
+ }
+ LABEL( 12, 386, 600, 14, "Only servers with room for all local players. No password servers.", .21, ITEM_ALIGN_LEFT, 0, 10 )
+ ARTBUTTON( 12, 400, 192, 26, "REFRESH", .28, 19, uiScript RefreshServers )
+ ARTBUTTON( 216, 400, 192, 26, "BACK", .28, 19, uiScript StopRefresh ; close playonline ; open main )
+ ARTBUTTON( 420, 400, 192, 26, "JOIN SERVER", .28, 19, uiScript JoinServer )
+ LABELWHITE( 12, 430, 600, 12, "D-pad / left stick: move   A: select / join   B: back   X: refresh", .22, ITEM_ALIGN_CENTER, 300, 10 )
+ CONTEXTHELP( 12, 440, 600, 16, "Left / Right: controls. Up / Down: servers or controls." )
+}

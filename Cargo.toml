@@ -1,0 +1,16 @@
+[package]
+name = "et-rust-core"
+version = "0.1.0"
+edition = "2024"
+license-file = "engine/COPYING.txt"
+publish = false
+
+[lib]
+path = "rust/lib.rs"
+crate-type = ["staticlib", "rlib"]
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"

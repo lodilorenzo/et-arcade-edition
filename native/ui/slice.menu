@@ -1,0 +1,563 @@
+// Unified shell: original ET local objectives plus the simplified online browser.
+#include "ui/menudef.h"
+#define WINDOW_X 0
+#define WINDOW_Y 0
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 480
+#define GROUP_NAME "slice"
+#include "ui/menumacros.h"
+#include "ui/slicemacros.h"
+
+menuDef {
+ name "main"
+ rect 0 0 640 480
+ fullscreen 1
+ visible 0
+ onOpen { hide artfocus ; uiScript sliceMapsMain ; conditionalScript ui_rustVideoPending 0 ( "open vid_confirm" ) ( "clearFocus" ) }
+ // Arcade Edition wordmark (tools/brand.py) above the window.
+ ART_PIECE( 170, 4, 300, 84, "ui/art/logo", "logo", "art", 1 )
+ ARTWINDOW( 168, 90, 304, 344, "MAIN MENU" )
+ LABEL( 184, 134, 272, 14, "Original ET objectives with Omni-bot", .2, ITEM_ALIGN_CENTER, 136, 10 )
+ // Online needs the unified engine; its art follows the same cvar test.
+ ART_THREE_IF( 192, 152, 256, 24, .088, "ui/art/button3", "bnPLAY ONLINE", "art", 1, "et_unified" )
+ ART_THREE_IF( 192, 152, 256, 24, .088, "ui/art/button_focus3", "bfPLAY ONLINE", "artfocus", 0, "et_unified" )
+ itemDef {
+  name "online"
+  rect 192 152 256 24
+  type ITEM_TYPE_BUTTON
+  text "PLAY ONLINE"
+  textfont UI_FONT_COURBD_30
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .28
+  textalign ITEM_ALIGN_CENTER
+  textalignx 128
+  textaligny 17
+  forecolor .78 .77 .7 1
+  visible 1
+  cvarTest "et_unified"
+  showCvar { "1" }
+  mouseEnter { show "bfPLAY ONLINE" ; setitemcolor online forecolor 1 .86 .58 1 }
+  mouseExit { hide "bfPLAY ONLINE" ; setitemcolor online forecolor .78 .77 .7 1 }
+  action { hide "bfPLAY ONLINE" ; setitemcolor online forecolor .78 .77 .7 1 ; uiScript sliceBrowse }
+ }
+ ARTBUTTON( 192, 182, 256, 26, "START MATCH", .3, 19, uiScript sliceStart )
+ FIELD( 186, 216, 268, 20 )
+ MULTI( 192, 217, 256, 18, "Players:", .23, 13, "cl_splitScreen", cvarFloatList { "1" 0 "2 split-screen" 1 "3 split + map" 3 "4 split-screen" 4 }, "Local and online. 2: side-by-side; 3: 2x2 with live map; 4: 2x2" )
+ FIELD( 186, 240, 268, 20 )
+// Stock and downloaded maps (native/map_list.c); A opens the chooser.
+ itemDef {
+  name "mapButton"
+  rect 192 241 256 18
+  type ITEM_TYPE_BUTTON
+  text "Map:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .23
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 128
+  textaligny 13
+  forecolor .6 .6 .6 1
+  visible 1
+  tooltip "Stock maps and maps downloaded from online servers"
+  mouseEnter { setitemcolor mapButton forecolor .9 .9 .9 1 ; setitemcolor mapValue forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor mapButton forecolor .6 .6 .6 1 ; setitemcolor mapValue forecolor .6 .6 .6 1 }
+  action { play "sound/menu/select.wav" ; close main ; open slice_maps }
+ }
+ itemDef {
+  name "mapValue"
+  rect 324 241 124 18
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustMapLabel"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .2
+  textaligny 13
+  forecolor .6 .6 .6 1
+  visible 1
+  decoration
+ }
+ FIELD( 186, 264, 268, 20 )
+ MULTI( 192, 265, 256, 18, "Total players:", .23, 13, "ui_matchPlayers", cvarFloatList { "4 (2 per team)" 4 "8 (4 per team)" 8 "12 (6 per team)" 12 "16 (8 per team)" 16 "24 (12 per team)" 24 "32 (16 per team)" 32 "40 (20 per team)" 40 "48 (24 per team)" 48 }, "Humans included; bots fill and balance both teams; next match" )
+ ARTBUTTON( 192, 292, 256, 24, "PLAYERS & CONTROLLERS", .24, 17, close main ; open players_setup )
+ ARTBUTTON( 192, 320, 256, 24, "OPTIONS", .28, 17, close main ; open options_system )
+ ARTBUTTON( 192, 348, 256, 24, "QUIT", .28, 17, uiScript Quit )
+ CONTEXTHELP( 184, 380, 272, 28, "Local match: choose team and class after the map loads." )
+ itemDef {
+  name "mapNote"
+  rect 184 412 272 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustMapNote"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .18
+  textalign ITEM_ALIGN_CENTER
+  textalignx 136
+  textaligny 10
+  forecolor .6 .6 .6 1
+  visible 1
+  decoration
+ }
+}
+
+// Player setup: profile and controller per player, keyboard & mouse owner, new profiles.
+menuDef {
+ name "players_setup"
+ rect 8 8 624 464
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus ; clearFocus ; uiScript slicePlayers }
+ onESC { close players_setup ; open main }
+ PANEL( 0, 0, 624, 464 )
+ TITLEBAR( 10, 8, 604, 24, "PLAYERS & CONTROLLERS", .22 )
+ LABELWHITE( 18, 40, 120, 14, "PLAYER 1", .24, ITEM_ALIGN_LEFT, 0, 11 )
+ itemDef {
+  name "padStatus1"
+  rect 140 40 466 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustPad1"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textaligny 11
+  forecolor .63 .66 .61 1
+  visible 1
+  decoration
+ }
+ FIELD( 12, 56, 600, 18 )
+ itemDef {
+  name "profile1"
+  rect 18 57 588 16
+  type ITEM_TYPE_MULTI
+  text "Profile:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "ui_localProfile1"
+  cvarStrList { "Guest (not saved)"; "" }
+  visible 1
+  tooltip "Saves this player's experience (XP) and medals between local matches"
+  mouseEnter { setitemcolor profile1 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor profile1 forecolor .6 .6 .6 1 }
+  action { uiScript sliceProfileChosen 1 }
+ }
+ FIELD( 12, 76, 600, 18 )
+ itemDef {
+  name "controller1"
+  rect 18 77 588 16
+  type ITEM_TYPE_MULTI
+  text "Controller:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "in_gamepadIndex"
+  cvarFloatList { "Auto (first free)" -1 "Controller 1" 0 "Controller 2" 1 "Controller 3" 2 "Controller 4" 3 "None" -2 }
+  visible 1
+  tooltip "Which controller this player uses"
+  mouseEnter { setitemcolor controller1 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor controller1 forecolor .6 .6 .6 1 }
+ }
+ LABELWHITE( 18, 102, 120, 14, "PLAYER 2", .24, ITEM_ALIGN_LEFT, 0, 11 )
+ itemDef {
+  name "padStatus2"
+  rect 140 102 466 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustPad2"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textaligny 11
+  forecolor .63 .66 .61 1
+  visible 1
+  decoration
+ }
+ FIELD( 12, 118, 600, 18 )
+ itemDef {
+  name "profile2"
+  rect 18 119 588 16
+  type ITEM_TYPE_MULTI
+  text "Profile:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "ui_localProfile2"
+  cvarStrList { "Guest (not saved)"; "" }
+  visible 1
+  tooltip "Saves this player's experience (XP) and medals between local matches"
+  mouseEnter { setitemcolor profile2 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor profile2 forecolor .6 .6 .6 1 }
+  action { uiScript sliceProfileChosen 2 }
+ }
+ FIELD( 12, 138, 600, 18 )
+ itemDef {
+  name "controller2"
+  rect 18 139 588 16
+  type ITEM_TYPE_MULTI
+  text "Controller:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "in_gamepadIndex2"
+  cvarFloatList { "Auto (first free)" -1 "Controller 1" 0 "Controller 2" 1 "Controller 3" 2 "Controller 4" 3 "None" -2 }
+  visible 1
+  tooltip "Which controller this player uses"
+  mouseEnter { setitemcolor controller2 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor controller2 forecolor .6 .6 .6 1 }
+ }
+ LABELWHITE( 18, 164, 120, 14, "PLAYER 3", .24, ITEM_ALIGN_LEFT, 0, 11 )
+ itemDef {
+  name "padStatus3"
+  rect 140 164 466 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustPad3"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textaligny 11
+  forecolor .63 .66 .61 1
+  visible 1
+  decoration
+ }
+ FIELD( 12, 180, 600, 18 )
+ itemDef {
+  name "profile3"
+  rect 18 181 588 16
+  type ITEM_TYPE_MULTI
+  text "Profile:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "ui_localProfile3"
+  cvarStrList { "Guest (not saved)"; "" }
+  visible 1
+  tooltip "Saves this player's experience (XP) and medals between local matches"
+  mouseEnter { setitemcolor profile3 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor profile3 forecolor .6 .6 .6 1 }
+  action { uiScript sliceProfileChosen 3 }
+ }
+ FIELD( 12, 200, 600, 18 )
+ itemDef {
+  name "controller3"
+  rect 18 201 588 16
+  type ITEM_TYPE_MULTI
+  text "Controller:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "in_gamepadIndex3"
+  cvarFloatList { "Auto (first free)" -1 "Controller 1" 0 "Controller 2" 1 "Controller 3" 2 "Controller 4" 3 "None" -2 }
+  visible 1
+  tooltip "Which controller this player uses"
+  mouseEnter { setitemcolor controller3 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor controller3 forecolor .6 .6 .6 1 }
+ }
+ LABELWHITE( 18, 226, 120, 14, "PLAYER 4", .24, ITEM_ALIGN_LEFT, 0, 11 )
+ itemDef {
+  name "padStatus4"
+  rect 140 226 466 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustPad4"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textaligny 11
+  forecolor .63 .66 .61 1
+  visible 1
+  decoration
+ }
+ FIELD( 12, 242, 600, 18 )
+ itemDef {
+  name "profile4"
+  rect 18 243 588 16
+  type ITEM_TYPE_MULTI
+  text "Profile:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "ui_localProfile4"
+  cvarStrList { "Guest (not saved)"; "" }
+  visible 1
+  tooltip "Saves this player's experience (XP) and medals between local matches"
+  mouseEnter { setitemcolor profile4 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor profile4 forecolor .6 .6 .6 1 }
+  action { uiScript sliceProfileChosen 4 }
+ }
+ FIELD( 12, 262, 600, 18 )
+ itemDef {
+  name "controller4"
+  rect 18 263 588 16
+  type ITEM_TYPE_MULTI
+  text "Controller:"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .22
+  textalign ITEM_ALIGN_RIGHT
+  textalignx 200
+  textaligny 12
+  forecolor .6 .6 .6 1
+  cvar "in_gamepadIndex4"
+  cvarFloatList { "Auto (first free)" -1 "Controller 1" 0 "Controller 2" 1 "Controller 3" 2 "Controller 4" 3 "None" -2 }
+  visible 1
+  tooltip "Which controller this player uses"
+  mouseEnter { setitemcolor controller4 forecolor .9 .9 .9 1 }
+  mouseExit { setitemcolor controller4 forecolor .6 .6 .6 1 }
+ }
+ FIELD( 12, 288, 600, 18 )
+ MULTI( 18, 289, 400, 16, "Keyboard & mouse:", .22, 12, "cl_keyboardPlayer", cvarFloatList { "Controllers only" 0 "Player 1" 1 "Player 2" 2 "Player 3" 3 "Player 4" 4 }, "Separate input device: this player uses keyboard/mouse, the others use controllers" )
+ INSET( 6, 312, 612, 66 )
+ EDITFIELD( 18, 318, 400, 16, "New profile name:", .22, 12, "ui_rustNewProfile", 20, 20, "A: edit / Up-Down: letter / Left-Right: move / X: delete / A: done" )
+ MULTI( 18, 338, 400, 16, "For player:", .22, 12, "ui_rustProfileTarget", cvarFloatList { "Player 1" 1 "Player 2" 2 "Player 3" 3 "Player 4" 4 }, "The new profile is selected for this player" )
+ itemDef {
+  name "profileMessage"
+  rect 18 358 588 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustProfileMessage"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textalign ITEM_ALIGN_CENTER
+  textalignx 294
+  textaligny 11
+  forecolor .95 .86 .58 1
+  visible 1
+  decoration
+ }
+ ARTBUTTON( 12, 384, 294, 24, "CREATE PROFILE", .26, 17, uiScript sliceProfileCreate )
+ ARTBUTTON( 318, 384, 294, 24, "BACK", .28, 17, close players_setup ; open main )
+ LABELWHITE( 12, 416, 600, 12, "Left / Right: change   A: edit name (Up-Down letters, Left-Right move, X delete)   B: back", .19, ITEM_ALIGN_CENTER, 300, 10 )
+ CONTEXTHELP( 12, 432, 600, 24, "Profiles save XP and medals between local matches. Input assignments also apply online." )
+}
+
+// Map chooser: maps with bot navigation first, then human-only maps.
+menuDef {
+ name "slice_maps"
+ rect 8 8 624 464
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus ; clearFocus ; uiScript sliceMaps }
+ onESC { close slice_maps ; open main }
+ PANEL( 0, 0, 624, 464 )
+ TITLEBAR( 10, 8, 604, 24, "CHOOSE MAP", .22 )
+ LABELWHITE( 14, 38, 360, 16, "MAP", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ LABELWHITE( 270, 38, 70, 16, "BOTS", .23, ITEM_ALIGN_LEFT, 0, 12 )
+ INSET( 6, 54, 392, 352 )
+ itemDef {
+  name "mapList"
+  rect 12 60 380 340
+  type ITEM_TYPE_LISTBOX
+  // Highlighted map name, for controller checks; the choice applies only on A.
+  cvar "ui_rustMapPick"
+  forecolor .9 .9 .88 1
+  border WINDOW_BORDER_FULL
+  bordercolor 0 0 0 0
+  outlinecolor .62 .5 .25 .45
+  textfont UI_FONT_COURBD_21
+  textscale .3
+  textaligny -6
+  elementwidth 364
+  elementheight 22
+  elementtype LISTBOX_TEXT
+  columns 2 2 248 20 258 96 8
+  feeder 64
+  visible 1
+  onFocus { setitemcolor mapList bordercolor .78 .63 .33 .9 }
+  leaveFocus { setitemcolor mapList bordercolor 0 0 0 0 }
+  onEnter { uiScript sliceMapPick }
+  doubleClick { uiScript sliceMapPick }
+ }
+ INSET( 404, 54, 214, 166 )
+ itemDef {
+  name "mapShot"
+  rect 412 62 198 150
+  style WINDOW_STYLE_SHADER
+  background "levelshots/unknownmap"
+  visible 1
+  decoration
+ }
+ itemDef {
+  name "mapPickName"
+  rect 406 228 210 16
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustMapPickName"
+  textfont UI_FONT_COURBD_21
+  textstyle ITEM_TEXTSTYLE_SHADOWED
+  textscale .24
+  textaligny 12
+  forecolor .95 .95 .88 1
+  visible 1
+  decoration
+ }
+ itemDef {
+  name "mapPickFile"
+  rect 406 246 210 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustMapPick"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textaligny 10
+  forecolor .63 .66 .61 1
+  visible 1
+  decoration
+ }
+ itemDef {
+  name "mapPickBots"
+  rect 406 264 210 14
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustMapPickBots"
+  textfont UI_FONT_COURBD_21
+  textscale .17
+  textaligny 10
+  forecolor .8 .8 .74 1
+  visible 1
+  decoration
+ }
+ CONTEXTHELP( 406, 286, 204, 60, "Stock and downloaded maps. Server-mod maps are excluded. NO BOTS: human players only." )
+ ARTBUTTON( 410, 352, 204, 24, "PLAY THIS MAP", .26, 17, uiScript sliceMapPick )
+ ARTBUTTON( 410, 382, 204, 24, "BACK", .28, 17, close slice_maps ; open main )
+ LABELWHITE( 12, 418, 600, 12, "D-pad / left stick: move   A: choose map   B: back", .22, ITEM_ALIGN_CENTER, 300, 10 )
+ LABEL( 12, 434, 600, 12, "Right from the list: buttons. Bot maps are listed first.", .2, ITEM_ALIGN_CENTER, 300, 10 )
+}
+
+menuDef {
+ name "ingame_main"
+ rect 0 0 640 480
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus ; conditionalScript ui_rustVideoPending 0 ( "open vid_confirm" ) ( "clearFocus" ) }
+ onESC { uiScript closeingame }
+ ARTWINDOW( 184, 98, 272, 342, "MATCH MENU" )
+ ARTBUTTON( 208, 140, 224, 26, "RESUME", .3, 19, uiScript closeingame )
+ ARTBUTTON( 208, 176, 224, 26, "CHANGE TEAM / CLASS / LOADOUT", .21, 19, uiScript sliceLoadout )
+ ARTBUTTON( 208, 212, 224, 26, "OPTIONS", .3, 19, close ingame_main ; open options_system )
+ ARTBUTTON( 208, 248, 224, 26, "LEAVE MATCH", .3, 19, uiScript Leave )
+ ARTBUTTON( 208, 284, 224, 26, "QUIT", .3, 19, uiScript Quit )
+ ARTBUTTON( 208, 320, 224, 26, "SERVER INFORMATION", .24, 19, close ingame_main ; open ingame_serverinfo )
+ ARTBUTTON( 208, 356, 224, 26, "CALL VOTE", .24, 19, uiScript clientCheckVote ; conditionalScript cg_ui_novote 0 ( "clearFocus ; open ingame_votedisabled" ) ( "close ingame_main ; open ingame_vote" ) )
+ LABEL( 200, 394, 240, 14, "Esc / Start: menu   L / Back: limbo", .18, ITEM_ALIGN_CENTER, 120, 10 )
+ CONTEXTHELP( 200, 412, 240, 24, "The match continues while this menu is open." )
+}
+
+menuDef {
+ name "options_system"
+ rect 96 8 448 464
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus ; uiScript systemCvarsGet ; uiScript vidSave ; uiScript sliceOptionsGet }
+ onESC { uiScript systemCvarsReset ; uiScript vidConfirm ; uiScript sliceBack }
+ PANEL( 0, 0, 448, 464 )
+ TITLEBAR( 10, 10, 428, 22, "DISPLAY", .2 )
+ INSET( 12, 56, 424, 256 )
+ ARTBUTTON( 18, 34, 412, 20, "USE MONITOR RESOLUTION / REFRESH", .25, 15, uiScript sliceMonitor )
+ LABEL( 18, 58, 412, 12, "Resolutions supported by this monitor, or use the button above", .2, ITEM_ALIGN_CENTER, 206, 9 )
+ // Filled on open from the monitor's modes (uiScript sliceOptionsGet); Apply uses the choice.
+ MULTI( 18, 78, 412, 18, "Resolution:", .25, 13, "ui_rustResolution", cvarStrList { "Current"; "current" }, "Left / Right: resolutions this monitor supports" )
+ YESNO( 18, 98, 412, 18, "Fullscreen:", .25, 13, "ui_r_fullscreen", "Windowed or fullscreen" )
+ MULTI( 18, 118, 412, 18, "Refresh:", .25, 13, "ui_r_displayRefresh", cvarFloatList { "Desktop" 0 "60 Hz" 60 "75 Hz" 75 "100 Hz" 100 "120 Hz" 120 "144 Hz" 144 "165 Hz" 165 "200 Hz" 200 "240 Hz" 240 }, "Select a rate supported by your monitor" )
+ YESNO( 18, 138, 412, 18, "V-Sync:", .25, 13, "ui_r_swapInterval", "Synchronize with monitor refresh" )
+ NUMERICFIELD( 18, 158, 412, 18, "FPS cap (0 = off):", .25, 13, "ui_com_maxfps", 4, "Use 0 with V-Sync" )
+ MULTI( 18, 178, 412, 18, "Texture detail:", .25, 13, "ui_r_picmip", cvarFloatList { "Full" 0 "Half" 1 "Quarter" 2 }, "Original game textures" )
+ MULTI( 18, 198, 412, 18, "Texture filter:", .25, 13, "ui_r_texturemode", cvarStrList { "Bilinear"; "GL_LINEAR_MIPMAP_NEAREST"; "Trilinear"; "GL_LINEAR_MIPMAP_LINEAR" }, "Native texture filtering" )
+ YESNO( 18, 218, 412, 18, "Anisotropic filtering:", .25, 13, "ui_r_ext_texture_filter_anisotropic", "When supported by the GPU" )
+ MULTI( 18, 238, 412, 18, "Filtering level:", .25, 13, "ui_r_textureAnisotropy", cvarFloatList { "1x" 1 "2x" 2 "4x" 4 "8x" 8 "16x" 16 }, "GPU-supported maximum applies" )
+ CONTEXTHELP( 18, 264, 412, 28, "Numbers: A to edit / arrows change digits / X delete / B cancel" )
+ itemDef {
+  name "resolutionError"
+  rect 18 296 412 12
+  type ITEM_TYPE_TEXT
+  cvar "ui_rustOptionsError"
+  textfont UI_FONT_COURBD_21
+  textscale .18
+  textalign ITEM_ALIGN_CENTER
+  textalignx 206
+  textaligny 9
+  forecolor 1 .5 .4 1
+  visible 1
+  decoration
+ }
+ TITLEBAR( 10, 316, 428, 18, "AUDIO / INPUT", .17 )
+ INSET( 12, 336, 424, 56 )
+ SLIDER( 18, 340, 412, 14, "Effects volume:", .23, 10, "s_volume" .7 0 1, "Native audio" )
+ SLIDER( 18, 356, 412, 14, "Music volume:", .23, 10, "s_musicvolume" .25 0 1, "Native menu music" )
+ SLIDER( 18, 372, 412, 14, "Mouse sensitivity:", .23, 10, "ui_sensitivity" 5 .1 20, "Mouse aim sensitivity" )
+ LABEL( 18, 394, 412, 10, "WASD / Mouse fire / Space jump / Ctrl crouch / Shift sprint / R reload", .15, ITEM_ALIGN_CENTER, 206, 8 )
+ ARTBUTTON( 18, 406, 196, 20, "GAMEPAD SETTINGS", .23, 15, open options_gamepad )
+ ARTBUTTON( 18, 430, 196, 20, "BACK", .28, 15, uiScript systemCvarsReset ; uiScript vidConfirm ; uiScript sliceBack )
+ ARTBUTTON( 234, 430, 196, 20, "APPLY", .28, 15, uiScript sliceApply )
+ ARTBUTTON( 234, 406, 196, 20, "ORIGINAL ET OPTIONS", .21, 15, uiScript systemCvarsReset ; close options_system ; open options )
+}
+
+menuDef {
+ name "options_gamepad"
+ popup
+ modal
+ rect 96 8 448 464
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus }
+ onESC { close options_gamepad }
+ ARTWINDOW( 0, 0, 448, 464, "GAMEPAD / AIM ASSIST" )
+ INSET( 12, 30, 424, 268 )
+ YESNO( 18, 34, 412, 14, "Enable XInput controller:", .23, 10, "in_gamepad", "Xbox-compatible controllers; reconnect automatically" )
+ SLIDER( 18, 58, 412, 14, "Move stick deadzone:", .23, 10, "cl_gamepadMoveDeadzone" .2 0 .5, "Increase to stop stick drift" )
+ SLIDER( 18, 82, 412, 14, "Look stick deadzone:", .23, 10, "cl_gamepadLookDeadzone" .2 0 .5, "Increase to stop stick drift" )
+ SLIDER( 18, 106, 412, 14, "Horizontal look speed:", .23, 10, "cl_gamepadYawSpeed" 120 30 360, "Degrees per second before pegged-stick acceleration" )
+ SLIDER( 18, 130, 412, 14, "Vertical look speed:", .23, 10, "cl_gamepadPitchSpeed" 90 30 240, "Degrees per second" )
+ YESNO( 18, 154, 412, 14, "Invert vertical look:", .23, 10, "cl_gamepadInvert", "Invert only controller look, not mouse" )
+ SLIDER( 18, 178, 412, 14, "Turn acceleration:", .23, 10, "cl_gamepadAccelScale" 2 1 4, "Hold the look stick fully sideways for faster turns" )
+ YESNO( 18, 202, 412, 14, "Aiming assistance:", .23, 10, "cg_gamepadAimAssist", "Controller-only slowdown and adhesion for SMGs and rifles" )
+ MULTI( 18, 226, 412, 14, "Aim assist strength:", .23, 10, "cl_gamepadAssistStrength", cvarFloatList { "Very low" .4 "Low" .7 "Normal" 1 "High" 1.3 "Very high" 1.6 "Maximum" 2 }, "Left / Right: weaker or stronger slowdown and tracking near targets" )
+ SLIDER( 18, 250, 412, 14, "Target slowdown:", .23, 10, "cl_gamepadFriction" .65 0 1, "Fine tuning: look speed reduction near visible enemies" )
+ SLIDER( 18, 274, 412, 14, "Target tracking:", .23, 10, "cl_gamepadAdhesion" .45 0 1, "Fine tuning: bounded tracking while moving or using the look stick" )
+ LABEL( 18, 302, 412, 14, "Sticks move/look / RT fire / LT zoom / X reload / A jump / B crouch", .18, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 318, 412, 14, "LB sprint / RB activate / tap Y next weapon / HOLD Y equipment wheel", .18, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 334, 412, 14, "Tap Up alt mode / HOLD Up class requests / Down prone / Left-Right lean", .18, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 350, 412, 14, "Back: limbo / hold L3: scores / hold RS: map / Start: menu", .18, ITEM_ALIGN_CENTER, 206, 10 )
+ CONTEXTHELP( 18, 368, 412, 30, "Changes save immediately. D-pad: adjust / A: select / B: back" )
+ ARTBUTTON( 18, 430, 412, 20, "BACK", .28, 15, close options_gamepad )
+ ARTBUTTON( 18, 402, 412, 20, "RADIAL MENU SETTINGS", .24, 15, open options_radial )
+}
+
+menuDef {
+ name "options_radial"
+ popup
+ modal
+ rect 96 90 448 300
+ fullscreen 0
+ visible 0
+ onOpen { hide artfocus }
+ onESC { close options_radial }
+ ARTWINDOW( 0, 0, 448, 300, "CONTROLLER RADIAL MENUS" )
+ INSET( 12, 38, 424, 84 )
+ SLIDER( 18, 42, 412, 14, "Hold delay (ms):", .23, 10, "cl_gamepadWheelHold" 150 100 1000, "Tap Y cycles weapons; hold Y opens equipment. Tap Up alternate; hold Up class requests." )
+ SLIDER( 18, 70, 412, 14, "Wheel stick deadzone:", .23, 10, "cl_gamepadRadialDeadzone" .35 .15 .8, "Increase to avoid accidental selection from stick drift." )
+ YESNO( 18, 98, 412, 14, "Wheel center help:", .23, 10, "cl_gamepadRadialHelp", "Show the center disc with the wheel name and highlighted choice" )
+ CONTEXTHELP( 18, 126, 412, 32, "Changes save immediately. B: back to gamepad settings." )
+ LABELWHITE( 18, 162, 412, 14, "Equipment: hold Y / LEFT stick / release Y to equip", .21, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 182, 412, 14, "Class request: hold Up / RIGHT stick / release Up to send", .19, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 202, 412, 14, "Select with the stick held / release at center selects nothing", .19, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 220, 412, 14, "No confirm or cancel buttons / selected icon flashes briefly", .19, ITEM_ALIGN_CENTER, 206, 10 )
+ LABEL( 18, 240, 412, 14, "Only your view is blocked; the match and other players continue", .18, ITEM_ALIGN_CENTER, 206, 10 )
+ ARTBUTTON( 18, 262, 412, 20, "BACK", .28, 15, close options_radial )
+}

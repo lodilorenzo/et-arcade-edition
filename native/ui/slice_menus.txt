@@ -1,0 +1,31 @@
+{
+ loadMenu { "ui/global.menu" }
+ loadMenu { "ui/slice.menu" }
+ loadMenu { "ui/vid_confirm.menu" }
+ loadMenu { "ui/options.menu" }
+ loadMenu { "ui/options_controls.menu" }
+ loadMenu { "ui/options_controls_default.menu" }
+ loadMenu { "ui/options_customise_game.menu" }
+ loadMenu { "ui/options_customise_hud.menu" }
+ loadMenu { "ui/options_system_gamma.menu" }
+ loadMenu { "ui/ingame_serverinfo.menu" }
+ loadMenu { "ui/ingame_vote.menu" }
+ loadMenu { "ui/ingame_vote_disabled.menu" }
+ loadMenu { "ui/ingame_vote_misc.menu" }
+ loadMenu { "ui/ingame_vote_misc_refrcon.menu" }
+ loadMenu { "ui/ingame_vote_map.menu" }
+ loadMenu { "ui/ingame_vote_players.menu" }
+ loadMenu { "ui/ingame_vote_players_warn.menu" }
+ loadMenu { "ui/wm_quickmessage.menu" }
+ loadMenu { "ui/wm_quickmessageAlt.menu" }
+ loadMenu { "ui/wm_ftquickmessage.menu" }
+ loadMenu { "ui/wm_ftquickmessageAlt.menu" }
+ loadMenu { "ui/playonline.menu" }
+ loadMenu { "ui/playonline_connecttoip.menu" }
+ loadMenu { "ui/playonline_serverinfo.menu" }
+ loadMenu { "ui/playonline_disablepb.menu" }
+ loadMenu { "ui/playonline_enablepb.menu" }
+ loadMenu { "ui/popup_password.menu" }
+ loadMenu { "ui/popup_errormessage.menu" }
+ loadMenu { "ui/popup_errormessage_pb.menu" }
+}
