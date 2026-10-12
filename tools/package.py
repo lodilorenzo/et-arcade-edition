@@ -6,7 +6,7 @@ plus its GPL source zip.
 Builds build/slice in Release (incremental; configured first if missing) inside the Visual Studio
 x86 developer environment, then writes dist/EnemyTerritory-ArcadeEdition-<version>.zip and -source.zip.
 
-Players extract the game zip anywhere writable and run Play-ET.exe. On first run it asks
+Players extract the game zip anywhere writable and run ET-arcade-edition.exe. On first run it asks
 for their original Wolfenstein: Enemy Territory 2.60b folder and copies pak0/pak1/pak2/mp_bin
 into the package's etmain folder (or they copy those four files there by hand).
 """
@@ -28,7 +28,7 @@ from smoke_server import PLAY_VIDEO_SETTINGS  # noqa: E402
 NAME = 'EnemyTerritory-ArcadeEdition'
 BUILD = ROOT / 'build/slice'
 MODULES = ('qagame', 'cgame', 'cgame2', 'cgame3', 'cgame4', 'ui')
-# Play-ET.exe derives these from the player's monitor on first run.
+# ET-arcade-edition.exe derives these from the player's monitor on first run.
 MONITOR_VIDEO = {'r_mode', 'r_customwidth', 'r_customheight', 'r_customaspect', 'r_displayRefresh', 'cg_fov'}
 ORIGINAL_DATA = {'pak0.pk3', 'pak1.pk3', 'pak2.pk3', 'mp_bin.pk3'}
 # Never publish original game data, identities, profiles, logs or machine-specific settings.
@@ -60,12 +60,12 @@ Wolfenstein: Enemy Territory 2.60b (freeware).
 FIRST START
  1. Extract this folder somewhere writable, e.g. C:\\Games\\Enemy Territory
     (not Program Files; use a path with plain letters, digits and spaces).
- 2. Run Play-ET.exe.
- 3. When asked, select your original Enemy Territory folder (the one containing
-    "etmain"). The launcher checks and copies these four files into this
-    package's etmain folder:
+ 2. Copy these four files from your original Enemy Territory 2.60b installation
+    into this package's etmain folder:
         pak0.pk3  pak1.pk3  pak2.pk3  mp_bin.pk3
-    You can also copy them there yourself before starting.
+ 3. Run ET-arcade-edition.exe. No installer or separate Visual C++ runtime is needed.
+ Alternatively, run ET-arcade-edition.exe before copying the files and select your original
+ Enemy Territory folder when asked; the launcher verifies and copies them for you.
  The first start uses your desktop resolution and refresh rate; change them in
  Options. Later starts keep your settings.
 
@@ -93,11 +93,11 @@ YOUR DATA
 
 TROUBLESHOOTING
  Launcher messages are also written to launcher.log; game consoles to etconsole.log in
- et-rust or the mod folder. Requires Windows 8.1 or newer and an OpenGL driver.
+ et-rust or the mod folder. This release targets Windows 10/11 and needs an OpenGL driver.
 
 LICENSES
  See LICENSE.txt (GPL v3 with id Software's additional terms) and THIRD-PARTY-NOTICES.txt.
- The complete corresponding source code is published as {source}.
+ The complete corresponding source code is provided separately as {source}.
 """
 
 NOTICES = """Third-party notices
@@ -119,8 +119,19 @@ Omni-bot (folder "omnibot")
  Omni-bot runtime (omnibot_et.dll, scripts and navigation) as distributed by the
  ET: Legacy mirror (https://mirror.etlegacy.com/omnibot/). Upstream source:
  https://github.com/omnibot/omnibot. The upstream runtime archive does not state its
- license terms; its readme and changelog are included unchanged. The game-side
- Omni-bot interface headers are GPL and included in the source archive (vendor/omnibot).
+ license terms; its readme and changelog are included unchanged. The project owner
+ has confirmed that permission to redistribute the bundled runtime is obtained.
+ This confirmation does not relicense the runtime under the engine's GPL.
+ The game-side Omni-bot interface headers are GPL and included in the source
+ archive (vendor/omnibot).
+
+Microsoft Visual C++ runtime (root folder DLLs)
+ Copyright (c) Microsoft Corporation. All rights reserved.
+ App-local x86 runtime files supplied with the licensed Visual Studio toolchain,
+ distributed under Microsoft's Visual Studio redistribution terms, not the GPL.
+ https://visualstudio.microsoft.com/license-terms/
+ https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files
+ The Windows Universal CRT is supplied by Windows 10/11.
 """
 
 
@@ -148,14 +159,22 @@ def write_zip(folder, archive):
 
 
 def stage_game(build, stage, source_name, version):
-    missing = [name for name in ['et.exe', 'Play-ET.exe'] + [f'{m}_mp_x86.dll' for m in MODULES] if not (build / name).is_file()]
+    missing = [name for name in ['et.exe', 'ET-arcade-edition.exe'] + [f'{m}_mp_x86.dll' for m in MODULES] if not (build / name).is_file()]
     if missing:
         raise SystemExit(f'Build {build} first (missing {", ".join(missing)}); see README.md.')
     for name in ('runtime/omnibot/omnibot_et.dll', 'native/ui/slice.menu'):
         if not (ROOT / name).is_file():
             raise SystemExit(f'Missing {name}.')
+    manifest = build.parent / 'runtime-files.txt'
+    if not manifest.is_file():
+        raise SystemExit('Reconfigure CMake first: missing app-local runtime manifest.')
+    runtimes = [Path(line) for line in manifest.read_text().splitlines() if line.strip()]
+    if not {'vcruntime140.dll', 'msvcp140.dll'} <= {path.name.lower() for path in runtimes} or not all(path.is_file() for path in runtimes):
+        raise SystemExit('Missing x86 Visual C++ redistributable DLLs; install the Visual Studio C++ tools.')
     stage.mkdir(parents=True)
-    for name in ('et.exe', 'Play-ET.exe'):
+    for path in runtimes:
+        shutil.copy2(path, stage / path.name)
+    for name in ('et.exe', 'ET-arcade-edition.exe'):
         shutil.copy2(build / name, stage)
     shell = stage / 'et-rust'
     shell.mkdir()
@@ -174,7 +193,8 @@ def stage_game(build, stage, source_name, version):
     (base / 'COPY ORIGINAL GAME FILES HERE.txt').write_text(
         'Copy pak0.pk3, pak1.pk3, pak2.pk3 and mp_bin.pk3 from the etmain folder of your\r\n'
         'Wolfenstein: Enemy Territory 2.60b installation into this folder,\r\n'
-        'or run Play-ET.exe and select your Enemy Territory folder.\r\n', encoding='ascii')
+        'Then run ET-arcade-edition.exe from the parent folder. No other installation is needed.\r\n'
+        'Alternatively, run it first and select your Enemy Territory folder.\r\n', encoding='ascii')
     (stage / 'README.txt').write_text(README.format(version=version, source=source_name).replace('\n', '\r\n'), encoding='ascii')
     (stage / 'THIRD-PARTY-NOTICES.txt').write_text(NOTICES.format(source=source_name).replace('\n', '\r\n'), encoding='ascii')
     shutil.copy2(ROOT / 'engine/COPYING.txt', stage / 'LICENSE.txt')
@@ -252,11 +272,12 @@ def main():
     shutil.rmtree(staging, ignore_errors=True)  # Only this script's own staging folder.
     stage_game(BUILD / 'Release', staging / game_name, f'{source_name}.zip', args.version)
     stage_source(staging / source_name)
+    shutil.copy2(ROOT / 'engine/COPYING.txt', staging / source_name / 'LICENSE.txt')
     for name in (game_name, source_name):
         write_zip(staging / name, out / f'{name}.zip')
         print(f'{out / f"{name}.zip"}  {(out / f"{name}.zip").stat().st_size / 2**20:.1f} MiB', flush=True)
     shutil.rmtree(staging)
-    print('Players: extract, run Play-ET.exe, select their original Enemy Territory 2.60b folder.')
+    print('Players: extract, copy the four original 2.60b PK3s into etmain, then run ET-arcade-edition.exe.')
 
 
 if __name__ == '__main__':

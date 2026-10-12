@@ -4,7 +4,11 @@ Wolfenstein: Enemy Territory 2.60b with split-screen, controller support and off
 
 **[Website](https://lodilorenzo.github.io/et-arcade-edition/)** · **[Releases](https://github.com/lodilorenzo/et-arcade-edition/releases)**
 
-This repository currently provides source code. No packaged releases have been published yet. Original game data and the Omni-bot runtime are **not included**.
+**[Download v1.0.0 for Windows 10/11](https://github.com/lodilorenzo/et-arcade-edition/releases/download/v1.0.0/EnemyTerritory-ArcadeEdition-1.0.0.zip)** · **[Matching source ZIP](https://github.com/lodilorenzo/et-arcade-edition/releases/download/v1.0.0/EnemyTerritory-ArcadeEdition-1.0.0-source.zip)**
+
+Extract the portable ZIP, copy `pak0.pk3`, `pak1.pk3`, `pak2.pk3` and `mp_bin.pk3` from your original 2.60b installation into its `etmain/` folder, then run `ET-arcade-edition.exe`. Omni-bot and Visual C++ runtime DLLs are bundled; no installer is needed. Original game data is **not included**.
+
+This source repository does not include the Omni-bot runtime or original game data; those must be supplied separately for development builds.
 
 ## What's different from ET
 
@@ -13,13 +17,13 @@ This repository currently provides source code. No packaged releases have been p
 - **Up to four Xbox/XInput controllers**, with hot-plugging, radial equipment/assistance wheels and adjustable controller-only aim assistance.
 - **Controller-friendly menus and server browser**, filtering out password-protected servers and servers without room for every local player.
 - **Local player profiles**, saved names, XP and medals, plus controller text entry.
-- **Downloaded-map selection** and support for compatible community maps. Bot navigation is provided by a separately installed Omni-bot distribution.
+- **Downloaded-map selection** and support for compatible community maps. The portable release bundles Omni-bot navigation; development builds need a separately installed Omni-bot distribution.
 - **Ultrawide and high-refresh display support**, with an expanded horizontal field of view and scaled HUD/menus.
 - **Portable launcher** that imports and verifies your own 2.60b game files and keeps settings, profiles and downloads in the package folder.
 
 ## Build from source
 
-Supported build platform: **Windows, MSVC, 32-bit x86**. Playing requires Windows 8.1 or newer and a working OpenGL driver.
+Supported build platform: **Windows, MSVC, 32-bit x86**. The first portable release targets Windows 10/11 and requires a working OpenGL driver. Visual C++ runtime DLLs are bundled beside the executable; no separate runtime installation is needed.
 
 Install Visual Studio C++ Build Tools with a Windows SDK, CMake 3.24+, Rust/Cargo and Python 3. From a Visual Studio developer shell:
 
@@ -35,7 +39,7 @@ ctest --test-dir build/slice -C Release --output-on-failure
 
 Choose an installed Visual Studio generator with `-G` if needed. CMake links a Rust library for selected shared gameplay helpers; the engine and game modules remain based on the original C/C++ source. This is not a complete engine rewrite.
 
-Outputs are in `build/slice/Release`: `Play-ET.exe`, `et.exe`, `etded.exe` and the game/client/UI modules. Compilation and the self-contained CTest checks do not require original game data. The repository includes the modified engine directly; there are no submodules to fetch.
+Outputs are in `build/slice/Release`: `ET-arcade-edition.exe`, `et.exe`, `etded.exe` and the game/client/UI modules. Compilation and the self-contained CTest checks do not require original game data. The repository includes the modified engine directly; there are no submodules to fetch.
 
 ## Run a development build
 
@@ -59,9 +63,9 @@ python tools/package.py --version 1.0.0
 
 This builds the application and writes a portable ZIP and corresponding source ZIP under `dist/`. `--no-build` packages an existing Release build. Original game archives, saved identities and profiles are excluded.
 
-Players extract a portable package and run `Play-ET.exe`. On first run, select the original 2.60b installation; the launcher verifies and copies its game archives. Do not upload your imported game data or player identity files to Git.
+Players extract a portable package, copy `pak0.pk3`, `pak1.pk3`, `pak2.pk3` and `mp_bin.pk3` from their original 2.60b installation into the package's `etmain/` folder, then run `ET-arcade-edition.exe`. Alternatively, run the launcher first and select the original installation to verify and copy its archives automatically. Do not upload imported game data or player identity files to Git.
 
-The Omni-bot runtime's redistribution terms require separate confirmation; the source repository does not distribute it or a binary package.
+The project owner has confirmed that permission to redistribute the bundled Omni-bot runtime is obtained. The runtime is not relicensed under the engine's GPL and remains excluded from this source repository.
 
 ## Checks
 

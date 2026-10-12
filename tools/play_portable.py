@@ -1,11 +1,11 @@
 """One command: build, package, update a local portable copy and play it.
 
-    python tools/play_portable.py [--no-build] [Play-ET.exe arguments...]
+    python tools/play_portable.py [--no-build] [ET-arcade-edition.exe arguments...]
 
 Builds build/slice (incremental; configures it if missing), runs tools/package.py, extracts the
 game zip over dist/play/EnemyTerritory-ArcadeEdition-dev (program files are replaced, saved profiles,
-downloads, identity and copied ET data are kept) and starts its Play-ET.exe. On first run the
-original files are imported from runtime/etmain when present; otherwise Play-ET.exe asks.
+downloads, identity and copied ET data are kept) and starts its ET-arcade-edition.exe. On first run the
+original files are imported from runtime/etmain when present; otherwise ET-arcade-edition.exe asks.
 """
 import argparse
 from pathlib import Path
@@ -30,7 +30,7 @@ def main():
     with zipfile.ZipFile(DIST / f'{NAME}.zip') as archive:
         archive.extractall(play)  # Overwrites shipped files only; player data is not in the zip.
     folder = play / NAME
-    command = [str(folder / 'Play-ET.exe')]
+    command = [str(folder / 'ET-arcade-edition.exe')]
     originals = ROOT / 'runtime/etmain'
     if not all((folder / 'etmain' / n).is_file() for n in ORIGINAL) and all((originals / n).is_file() for n in ORIGINAL):
         command += ['--import', str(originals)]  # Your own extracted 2.60b files; verified by the launcher.

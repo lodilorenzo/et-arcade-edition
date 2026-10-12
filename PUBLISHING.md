@@ -10,7 +10,7 @@ https://lodilorenzo.github.io/et-arcade-edition/
 
 Keep `docs/.nojekyll`. All local asset links are relative, so the project URL works without a custom domain or JavaScript build tool. Commit website updates to `main`; GitHub Pages rebuilds automatically. Run `node tests/site_layout.mjs` before publishing layout changes.
 
-The finished gameplay trailers exclude the development-only Rust segment. There is no public portable release yet; the page links to the Releases listing and the current source ZIP, not nonexistent local download files. Update the release notice and links when an actual portable build is published.
+The finished gameplay trailers exclude the development-only Rust segment. The page links directly to the v1.0.0 portable ZIP, matching source ZIP and SHA-256 checksums. Update these versioned links when publishing a new release.
 
 ## Source and releases
 
@@ -18,4 +18,4 @@ See README.md for building and packaging. `tools/export_source.py` exports a new
 
 Before pushing, review staged files for credentials, personal data and distribution rights. The exporter's filename filters and size checks are safeguards, not a complete security/licensing audit. Never commit `runtime/`, original `.pk3` archives or player identity files.
 
-Before distributing a portable binary package, confirm the Omni-bot runtime's redistribution terms and provide the matching complete GPL source alongside the release. The original ET game data must remain player-supplied.
+The project owner has confirmed permission to redistribute the bundled Omni-bot runtime for this release; it is not relicensed under the engine's GPL. Each portable release must provide the matching complete GPL source and retain third-party notices. Original ET game data must remain player-supplied.

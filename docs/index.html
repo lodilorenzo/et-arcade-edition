@@ -277,8 +277,8 @@
 <!-- 06 · Download -->
 <section class="card" id="download">
   <p class="eyebrow">06 · Download</p>
-  <h2 class="headline">Get the source or check for portable releases</h2>
-  <p class="sub">Build instructions are in the source repository. Original game files are not included: use your own Enemy Territory 2.60b installation.</p>
+  <h2 class="headline">Download the portable build and add your own 2.60b game data</h2>
+  <p class="sub">No installer needed. Original game files are not included: copy them from your Enemy Territory 2.60b installation.</p>
 </section>
 
 <section class="wrap">
@@ -286,30 +286,30 @@
     <img class="boxart" src="assets/cover.webp" width="720" height="1080" alt="Enemy Territory: Arcade Edition cover: an Axis soldier waits at a corner as two Allied soldiers advance down a Gold Rush street" loading="lazy" decoding="async">
     <div class="get-copy">
       <div class="actions">
-        <a class="btn btn-focus btn-large" href="https://github.com/lodilorenzo/et-arcade-edition/releases">Check releases</a>
-        <a class="btn" href="https://github.com/lodilorenzo/et-arcade-edition/archive/refs/heads/main.zip">Source (GPL)</a>
+        <a class="btn btn-focus btn-large" href="https://github.com/lodilorenzo/et-arcade-edition/releases/download/v1.0.0/EnemyTerritory-ArcadeEdition-1.0.0.zip">Download v1.0.0</a>
+        <a class="btn" href="https://github.com/lodilorenzo/et-arcade-edition/releases/download/v1.0.0/EnemyTerritory-ArcadeEdition-1.0.0-source.zip">Source (GPL)</a>
       </div>
-      <p class="hint">No packaged releases are published yet. <a class="build-link" href="https://github.com/lodilorenzo/et-arcade-edition#build-from-source">Build from source</a> to play.</p>
-      <p class="hint">Windows 8.1 or newer · Xbox / XInput controllers optional · No original game data included</p>
+      <p class="hint">Version 1.0.0 · <a class="build-link" href="https://github.com/lodilorenzo/et-arcade-edition/releases/download/v1.0.0/EnemyTerritory-ArcadeEdition-1.0.0-SHA256SUMS.txt">SHA-256 checksums</a></p>
+      <p class="hint">Windows 10/11 · Xbox / XInput controllers optional · No original game data included</p>
     </div>
   </div>
 
   <div class="steps">
     <div class="plate step">
-      <div class="titlebar"><span>01 · Build or download</span></div>
-      <p>Build from source, or extract a portable release when available. A portable package contains
-        <code>Play-ET.exe</code>, the engine, the modules and the menus. Local bot matches also need the
-        Omni-bot runtime. Use a folder you can write to.</p>
+      <div class="titlebar"><span>01 · Download</span></div>
+      <p>Extract the ZIP to a folder you can write to. It contains <code>ET-arcade-edition.exe</code>,
+        the engine, the modules, the menus, Omni-bot and the Visual C++ runtime DLLs.</p>
     </div>
     <div class="plate step">
       <div class="titlebar"><span>02 · Add game data</span></div>
-      <p>On first run, choose your <b>Enemy Territory 2.60b</b> folder. The launcher copies
-        <code>pak0</code>–<code>pak2</code> and <code>mp_bin</code> after checking their SHA-256 hashes against the 2.60b release.</p>
+      <p>Copy <code>pak0.pk3</code>, <code>pak1.pk3</code>, <code>pak2.pk3</code> and <code>mp_bin.pk3</code>
+        into the package's <code>etmain</code> folder. Alternatively, select your 2.60b installation on first run
+        and the launcher verifies and copies the files for you.</p>
     </div>
     <div class="plate step">
       <div class="titlebar"><span>03 · Play</span></div>
-      <p>Choose <b>Start Match</b> to play against bots, or <b>Play Online</b> to browse servers. Profiles, downloads and your
-        identity stay in the package folder.</p>
+      <p>Run <code>ET-arcade-edition.exe</code>, then choose <b>Start Match</b> to play against bots or
+        <b>Play Online</b> to browse servers. Profiles, downloads and your identity stay in the package folder.</p>
     </div>
   </div>
 

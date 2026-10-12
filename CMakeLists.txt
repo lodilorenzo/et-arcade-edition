@@ -9,6 +9,11 @@ option(ET_RUST_RANDOM "Replace shared seeded RNG with Rust" ON)
 option(ET_RUST_SHARED "Replace shared math, token lexer and bounded movement helpers with Rust" ${ET_RUST_RANDOM})
 find_program(CARGO cargo REQUIRED)
 set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
+# App-local runtime DLLs: portable packages need no separate VC++ installation.
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+include(InstallRequiredSystemLibraries)
+string(REPLACE ";" "\n" runtime_files "${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}")
+file(WRITE "${CMAKE_BINARY_DIR}/runtime-files.txt" "${runtime_files}\n")
 add_compile_definitions(WIN32 _WINDOWS _CRT_SECURE_NO_WARNINGS)
 
 # Reuse upstream's authoritative file lists; do not execute its Python-2 scripts.
@@ -160,6 +165,7 @@ endforeach()
 
 # Portable player launcher for packaged builds (tools/package.py).
 add_executable(Play-ET WIN32 native/launcher.c native/launcher.rc)
+set_target_properties(Play-ET PROPERTIES OUTPUT_NAME "ET-arcade-edition")
 target_compile_definitions(Play-ET PRIVATE UNICODE _UNICODE)
 target_link_libraries(Play-ET PRIVATE bcrypt ole32 shell32 uuid)
 

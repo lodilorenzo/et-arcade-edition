@@ -1,4 +1,4 @@
-/* Portable launcher (Play-ET.exe). Everything lives next to this executable:
+/* Portable launcher (ET-arcade-edition.exe). Everything lives next to this executable:
  * it checks the player's original ET 2.60b files (copying them from a chosen
  * installation if missing), seeds first-run video from the current monitor,
  * writes autoexec.cfg and starts et.exe in unified mode. Static settings are
@@ -226,7 +226,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, PWSTR line, int show
             if (MessageBoxW(NULL, L"This game uses the data files of the original Wolfenstein: Enemy Territory 2.60b "
                 L"(freeware). Four files are needed from its etmain folder:\n\n"
                 L"    pak0.pk3   pak1.pk3   pak2.pk3   mp_bin.pk3\n\n"
-                L"You can copy them yourself into the etmain folder next to Play-ET.exe, "
+                L"You can copy them yourself into the etmain folder next to ET-arcade-edition.exe, "
                 L"or select your Enemy Territory folder now and they will be copied for you.\n\n"
                 L"Select your Enemy Territory folder now?", title, MB_ICONINFORMATION | MB_YESNO) != IDYES ||
                 !PickFolder(source, MAX_PATH)) return 2;

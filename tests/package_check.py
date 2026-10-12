@@ -1,10 +1,12 @@
-"""Published-package check: build the zips, extract the game into a path with spaces, reject a
-bad import, import the original files from runtime/etmain, and play a local Omni-bot match
-through Play-ET.exe. python tests/package_check.py (opens a game window; no network play).
+"""Published-package check: extract into a path with spaces, copy PK3 files by hand,
+then play an Omni-bot match through ET-arcade-edition.exe. Also checks import and app-local DLLs.
+python tests/package_check.py [--archive path/to/release.zip] (opens a game window).
 """
+import argparse
 import ctypes as c
 from ctypes import wintypes as w
 import hashlib
+import os
 from pathlib import Path
 import re
 import shutil
@@ -47,18 +49,32 @@ def game_process(folder):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--archive', type=Path, help='Check an existing release and its matching source ZIP')
+    args = parser.parse_args()
     work = ROOT / 'build/package-check'
+    archive = args.archive.resolve() if args.archive else work / 'dist/EnemyTerritory-ArcadeEdition-check.zip'
+    if args.archive and archive.is_relative_to(work.resolve()):
+        parser.error('The archive must be outside the check\'s temporary build/package-check folder.')
     shutil.rmtree(work, ignore_errors=True)  # Only this check's own folder.
-    subprocess.run([sys.executable, str(ROOT / 'tools/package.py'), '--out', str(work / 'dist'), '--version', 'check'], check=True)
-    archive = work / 'dist/EnemyTerritory-ArcadeEdition-check.zip'
+    if not args.archive:
+        subprocess.run([sys.executable, str(ROOT / 'tools/package.py'), '--out', str(work / 'dist'), '--version', 'check'], check=True)
     with zipfile.ZipFile(archive) as z:
         names = z.namelist()
-        assert not [n for n in names if Path(n).name in ORIGINAL + ('etkey',)], 'Original data or identity packaged'
+        assert not [n for n in names if Path(n).name in ORIGINAL + ('etkey',) or Path(n).suffix.lower() in ('.pk3', '.log')], 'Original data, identity or logs packaged'
+        assert {Path(n).parts[0] for n in names} == {archive.stem}, 'Unexpected ZIP root folder'
+        for dll in ('vcruntime140.dll', 'msvcp140.dll'):
+            assert f'{archive.stem}/{dll}' in names, f'Missing app-local runtime: {dll}'
+        assert f'{archive.stem}/omnibot/omnibot_et.dll' in names
+        assert f'{archive.stem}/ET-arcade-edition.exe' in names
+        assert f'{archive.stem}/Play-ET.exe' not in names
         z.extractall(work / 'My Games')
-    with zipfile.ZipFile(work / 'dist/EnemyTerritory-ArcadeEdition-check-source.zip') as z:
+    with zipfile.ZipFile(archive.with_name(f'{archive.stem}-source.zip')) as z:
+        source = f'{archive.stem}-source/'
+        assert z.read(source + 'LICENSE.txt') == z.read(source + 'engine/COPYING.txt'), 'Source ZIP license missing or changed'
         assert any(n.endswith('native/launcher.c') for n in z.namelist()) and any(n.endswith('engine/src/client/cl_main.c') for n in z.namelist())
-    folder = work / 'My Games/EnemyTerritory-ArcadeEdition-check'
-    launcher = folder / 'Play-ET.exe'
+    folder = work / 'My Games' / archive.stem
+    launcher = folder / 'ET-arcade-edition.exe'
     log = folder / 'launcher.log'
 
     # A wrong folder is refused and nothing is copied.
@@ -70,8 +86,10 @@ def main():
     assert 'missing: pak0.pk3' in text and 'not the 2.60b version: pak1.pk3' in text, text
     assert not [n for n in ORIGINAL if (folder / 'etmain' / n).exists()]
 
-    # Import from the original installation files; windowed only for this check.
-    game = subprocess.Popen([str(launcher), '--import', str(ROOT / 'runtime/etmain'), '+set', 'r_fullscreen', '0',
+    # User workflow: just copy the four PK3s into etmain and run the launcher.
+    for name in ORIGINAL:
+        shutil.copy2(ROOT / 'runtime/etmain' / name, folder / 'etmain' / name)
+    game = subprocess.Popen([str(launcher), '+set', 'r_fullscreen', '0',
                              '+set', 'r_mode', '-1', '+set', 'r_customwidth', '1280', '+set', 'r_customheight', '720',
                              '+set', 'ui_rustMenuTest', '1', '+set', 'in_mouse', '0', '+set', 's_initsound', '0'])
     try:
@@ -98,15 +116,24 @@ def main():
             assert time.monotonic() < deadline and game.poll() is None, 'Bots did not join'
             time.sleep(.5)
         assert (folder / 'etmain/etkey').stat().st_size >= 28, 'Identity not generated inside the package'
+        # Enumerate x86 modules with x86 PowerShell, not just the WOW64 host DLLs.
+        powershell = Path(os.environ['WINDIR']) / 'SysWOW64/WindowsPowerShell/v1.0/powershell.exe'
+        loaded = subprocess.check_output([str(powershell) if powershell.is_file() else 'powershell', '-NoProfile', '-Command',
+            f'(Get-Process -Id {process.pid}).Modules | ForEach-Object {{ $_.FileName }}'], text=True)
+        loaded = {Path(line.strip()).resolve() for line in loaded.splitlines() if line.strip()}
+        for dll in ('vcruntime140.dll', 'msvcp140.dll'):
+            assert (folder / dll).resolve() in loaded, f'Runtime did not load from the ZIP: {dll}'
+        assert 'Copied the original' not in log.read_text(encoding='utf-8'), 'Manual-copy workflow must not import'
         console_command(process, 'quit')
         assert game.wait(timeout=30) == 0
         text = console.read_text(encoding='latin-1')
         assert not re.search(r'menu parse error|unknown menu keyword|Couldn\'t load', text, re.I), console
-        # Second start keeps the player's saved video instead of reseeding it.
-        assert subprocess.run([str(launcher), '+quit'], timeout=60).returncode == 0
+        # Verified import remains available, and saved video is not reseeded.
+        assert subprocess.run([str(launcher), '--import', str(ROOT / 'runtime/etmain'), '+quit'], timeout=60).returncode == 0
+        assert 'Copied the original' in log.read_text(encoding='utf-8')
         assert 'exec play-video.cfg' not in (folder / 'et-rust/autoexec.cfg').read_text(encoding='latin-1')
-        print(f'PASS package: no original data/identity in zip, bad import refused, verified import, stock modules extracted, '
-              f'portable omnibot path with spaces, local Omni-bot match, identity in package, saved video kept. {folder}')
+        print(f'PASS package: no original data/identity in ZIP, bad import refused, copy-PK3-and-run startup, verified import, '
+              f'stock modules extracted, bundled VC++ DLLs loaded, local Omni-bot match, identity in package, saved video kept. {folder}')
     finally:
         if game.poll() is None:
             process = game_process(folder)
